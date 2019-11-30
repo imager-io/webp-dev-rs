@@ -1,0 +1,26 @@
+[package]
+name = "webp-dev"
+version = "0.1.0"
+authors = ["colbyn <hello@colbyn.com>"]
+edition = "2018"
+publish = false
+
+[features]
+default = []
+buildtype-docs-only = []
+
+[package.metadata.docs.rs]
+no-default-features = true
+features = ["buildtype-docs-only"]
+
+[dependencies]
+libc = "^0.2"
+image = "^0.22"
+
+[build-dependencies]
+reqwest = "0.9.22"
+tar = "0.4.26"
+flate2 = "1.0.12"
+bindgen = "0.50"
+cc = "1.0.46"
+glob = "0.3.0"
