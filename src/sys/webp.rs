@@ -1205,7 +1205,7 @@ mod test {
         let mut config: WebPConfig = unsafe {std::mem::zeroed()};
         unsafe {
             assert!(webp_config_init(&mut config) != 0);
-            // assert!(webp_validate_config(&mut config) != 0);
+            assert!(webp_validate_config(&mut config) != 0);
         };
     }
 
@@ -1214,8 +1214,6 @@ mod test {
         let mut picture: WebPPicture = unsafe {std::mem::zeroed()};
         unsafe {
             webp_picture_init(&mut picture);
-            // assert!(webp_config_init(&mut config) != 0);
-            // assert!(webp_validate_config(&mut config) != 0);
         };
     }
 }
