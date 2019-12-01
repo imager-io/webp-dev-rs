@@ -3,8 +3,6 @@
 #include <webp/encode.h>
 #include <webp/decode.h>
 #include <webp/types.h>
-#include <imageio/image_enc.h>
-#include <imageio/image_dec.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>

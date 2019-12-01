@@ -1,5 +1,5 @@
 # About
-Rust bindings to `libwebp`, `libwebpdemux`, `imageio`, workarounds for static/inline C functions and some other miscellaneous stuff.
+Rust bindings to `libwebp`, `libwebpdemux`, and workarounds for static/inline C functions and some other miscellaneous stuff.
 
 **Much of the API doc comments from the C header files have been included with their rust FFI counterparts.**
 

@@ -6,6 +6,3 @@
 pub mod webp {
     include!(concat!(env!("OUT_DIR"), "/bindings_webp.rs"));
 }
-pub mod imageio {
-    include!(concat!(env!("OUT_DIR"), "/bindings_imageio.rs"));
-}

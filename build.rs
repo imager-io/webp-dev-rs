@@ -143,24 +143,24 @@ pub const WEBP_HEADERS: &[&str] = &[
 // IMAGEIO PATHS
 ///////////////////////////////////////////////////////////////////////////////
 
-pub const IMAGEIO_STATIC_LIBS: &[(&str, &str)] = &[
-    ("imagedec", "./imageio/libimagedec.a"),
-    ("imageenc", "./imageio/libimageenc.a"),
-    ("imageio_util", "./imageio/libimageio_util.a"),
-];
+// pub const IMAGEIO_STATIC_LIBS: &[(&str, &str)] = &[
+//     ("imagedec", "./imageio/libimagedec.a"),
+//     ("imageenc", "./imageio/libimageenc.a"),
+//     ("imageio_util", "./imageio/libimageio_util.a"),
+// ];
 
-pub const IMAGEIO_HEADERS: &[&str] = &[
-    "imageio/image_dec.h",
-    "imageio/image_enc.h",
-    "imageio/imageio_util.h",
-    "imageio/jpegdec.h",
-    "imageio/metadata.h",
-    "imageio/pngdec.h",
-    "imageio/pnmdec.h",
-    "imageio/tiffdec.h",
-    "imageio/webpdec.h",
-    "imageio/wicdec.h",
-];
+// pub const IMAGEIO_HEADERS: &[&str] = &[
+//     "imageio/image_dec.h",
+//     "imageio/image_enc.h",
+//     "imageio/imageio_util.h",
+//     "imageio/jpegdec.h",
+//     "imageio/metadata.h",
+//     "imageio/pngdec.h",
+//     "imageio/pnmdec.h",
+//     "imageio/tiffdec.h",
+//     "imageio/webpdec.h",
+//     "imageio/wicdec.h",
+// ];
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -190,21 +190,21 @@ fn build() {
             .to_str()
             .expect("PathBuf as str")
     });
-    println!("cargo:rustc-link-search=native={}", {
-        source_path
-            .join("imageio")
-            .to_str()
-            .expect("PathBuf as str")
-    });
+    // println!("cargo:rustc-link-search=native={}", {
+    //     source_path
+    //         .join("imageio")
+    //         .to_str()
+    //         .expect("PathBuf as str")
+    // });
     for (name, _) in WEBP_STATIC_LIBS {
         println!("cargo:rustc-link-lib=static={}", name);
     }
-    for (name, _) in IMAGEIO_STATIC_LIBS {
-        println!("cargo:rustc-link-lib=static={}", name);
-    }
-    // * DYNAMIC LIBRARY DEPENDENCIES - TODO: PHASE OUT
-    println!("cargo:rustc-link-lib=jpeg");
-    println!("cargo:rustc-link-lib=png");
+    // for (name, _) in IMAGEIO_STATIC_LIBS {
+    //     println!("cargo:rustc-link-lib=static={}", name);
+    // }
+    // // * DYNAMIC LIBRARY DEPENDENCIES - TODO: PHASE OUT
+    // println!("cargo:rustc-link-lib=jpeg");
+    // println!("cargo:rustc-link-lib=png");
     // CODEGEN
     let codegen = |file_name: &str, headers: &[&str]| {
         let codegen = bindgen::Builder::default();
@@ -224,7 +224,7 @@ fn build() {
             .expect("Couldn't write bindings!");    
     };
     codegen("bindings_webp.rs", WEBP_HEADERS);
-    codegen("bindings_imageio.rs", IMAGEIO_HEADERS);
+    // codegen("bindings_imageio.rs", IMAGEIO_HEADERS);
     // COMPILE CBITS
     cc::Build::new()
         .include({
