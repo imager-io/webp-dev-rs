@@ -3,15 +3,15 @@ name = "webp-dev"
 version = "0.1.0"
 authors = ["colbyn <hello@colbyn.com>"]
 edition = "2018"
-publish = false
+keywords = ["webp", "compression", "vp8", "webm", "image"]
+description = "Rust bindings to libwebp (plus related) and some other miscellaneous stuff."
+license = "MIT"
+homepage = "https://github.com/imager-io/webp-dev-rs"
+repository = "https://github.com/imager-io/webp-dev-rs"
 
 [features]
 default = []
 buildtype-docs-only = []
-
-[package.metadata.docs.rs]
-no-default-features = true
-features = ["buildtype-docs-only"]
 
 [dependencies]
 libc = "^0.2"
