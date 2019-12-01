@@ -86,14 +86,21 @@ pub const WebPPreset_WEBP_PRESET_TEXT: u32 = crate::raw::webp::WebPPreset_WEBP_P
 ///////////////////////////////////////////////////////////////////////////////
 
 
+// Remove the transparency information (if present) by blending the color with
+// the background color 'background_rgb' (specified as 24bit RGB triplet).
+// After this call, all alpha values are reset to 0xff.
 pub unsafe fn webp_blend_alpha(pic: *mut WebPPicture, background_rgb: u32) {
     crate::raw::webp::WebPBlendAlpha(pic, background_rgb)
 }
 
+/// Helper function: given a width x height plane of RGBA or YUV(A) samples
+/// clean-up or smoothen the YUV or RGB samples under fully transparent area,
+/// to help compressibility (no guarantee, though).
 pub unsafe fn webp_cleanup_transparent_area(picture: *mut WebPPicture) {
     crate::raw::webp::WebPCleanupTransparentArea(picture)
 }
 
+/// Internal, version-checked, entry point
 pub unsafe fn webp_config_init_internal(
     arg1: *mut WebPConfig,
     arg2: WebPPreset,
@@ -103,6 +110,12 @@ pub unsafe fn webp_config_init_internal(
     crate::raw::webp::WebPConfigInitInternal(arg1, arg2, arg3, arg4)
 }
 
+/// Activate the lossless compression mode with the desired efficiency level
+/// between 0 (fastest, lowest compression) and 9 (slower, best compression).
+/// A good default level is '6', providing a fair tradeoff between compression
+/// speed and final compressed size.
+/// This function will overwrite several fields from config: 'method', 'quality'
+/// and 'lossless'. Returns false in case of parameter error.
 pub unsafe fn webp_config_lossless_preset(
     config: *mut WebPConfig,
     level: ::std::os::raw::c_int,
@@ -110,6 +123,9 @@ pub unsafe fn webp_config_lossless_preset(
     crate::raw::webp::WebPConfigLosslessPreset(config, level)
 }
 
+/// Non-incremental version. This version decodes the full data at once, taking
+/// 'config' into account. Returns decoding status (which should be VP8_STATUS_OK
+/// if the decoding was successful). Note that 'config' cannot be NULL.
 pub unsafe fn webp_decode(
     data: *const u8,
     data_size: usize,
@@ -118,6 +134,7 @@ pub unsafe fn webp_decode(
     crate::raw::webp::WebPDecode(data, data_size, config)
 }
 
+/// Same as WebPDecodeRGBA, but returning A, R, G, B, A, R, G, B... ordered data.
 pub unsafe fn webp_decode_argb(
     data: *const u8,
     data_size: usize,
@@ -143,6 +160,7 @@ pub unsafe fn webp_decode_argb_into(
     )
 }
 
+/// Same as WebPDecodeRGB, but returning B, G, R, B, G, R... ordered data.
 pub unsafe fn webp_decode_bgr(
     data: *const u8,
     data_size: usize,
@@ -157,6 +175,7 @@ pub unsafe fn webp_decode_bgr(
     )
 }
 
+/// Same as WebPDecodeRGBA, but returning B, G, R, A, B, G, R, A... ordered data.
 pub unsafe fn webp_decode_bgra(
     data: *const u8,
     data_size: usize,
@@ -203,6 +222,8 @@ pub unsafe fn webp_decode_bgr_into(
     )
 }
 
+/// Same as WebPDecodeRGBA, but returning R, G, B, R, G, B... ordered data.
+/// If the bitstream contains transparency, it is ignored.
 pub unsafe fn webp_decode_rgb(
     data: *const u8,
     data_size: usize,
@@ -217,6 +238,11 @@ pub unsafe fn webp_decode_rgb(
     )
 }
 
+/// Decodes WebP images pointed to by 'data' and returns RGBA samples, along
+/// with the dimensions in *width and *height. The ordering of samples in
+/// memory is R, G, B, A, R, G, B, A... in scan order (endian-independent).
+/// The returned pointer should be deleted calling WebPFree().
+/// Returns NULL in case of error.
 pub unsafe fn webp_decode_rgba(
     data: *const u8,
     data_size: usize,
@@ -231,6 +257,14 @@ pub unsafe fn webp_decode_rgba(
     )
 }
 
+/// These five functions are variants of the above ones, that decode the image
+/// directly into a pre-allocated buffer 'output_buffer'. The maximum storage
+/// available in this buffer is indicated by 'output_buffer_size'. If this
+/// storage is not sufficient (or an error occurred), NULL is returned.
+/// Otherwise, output_buffer is returned, for convenience.
+/// The parameter 'output_stride' specifies the distance (in bytes)
+/// between scanlines. Hence, output_buffer_size is expected to be at least
+/// output_stride x picture-height.
 pub unsafe fn webp_decode_rgba_into(
     data: *const u8,
     data_size: usize,
@@ -247,6 +281,8 @@ pub unsafe fn webp_decode_rgba_into(
     )
 }
 
+/// RGB and BGR variants. Here too the transparency information, if present,
+/// will be dropped and ignored.
 pub unsafe fn webp_decode_rgb_into(
     data: *const u8,
     data_size: usize,
@@ -263,6 +299,15 @@ pub unsafe fn webp_decode_rgb_into(
     )
 }
 
+/// Decode WebP images pointed to by 'data' to Y'UV format(*). The pointer
+/// returned is the Y samples buffer. Upon return, *u and *v will point to
+/// the U and V chroma data. These U and V buffers need NOT be passed to
+/// WebPFree(), unlike the returned Y luma one. The dimension of the U and V
+/// planes are both (*width + 1) / 2 and (*height + 1)/ 2.
+/// Upon return, the Y buffer has a stride returned as '*stride', while U and V
+/// have a common stride returned as '*uv_stride'.
+/// Return NULL in case of error.
+/// (*) Also named Y'CbCr. See: http://en.wikipedia.org/wiki/YCbCr
 pub unsafe fn webp_decode_yuv(
     data: *const u8,
     data_size: usize,
@@ -285,6 +330,13 @@ pub unsafe fn webp_decode_yuv(
     )
 }
 
+/// WebPDecodeYUVInto() is a variant of WebPDecodeYUV() that operates directly
+/// into pre-allocated luma/chroma plane buffers. This function requires the
+/// strides to be passed: one for the luma plane and one for each of the
+/// chroma ones. The size of each plane buffer is passed as 'luma_size',
+/// 'u_size' and 'v_size' respectively.
+/// Pointer to the luma plane ('*luma') is returned or NULL if an error occurred
+/// during decoding (or because some buffers were found to be too small).
 pub unsafe fn webp_decode_yuv_into(
     data: *const u8,
     data_size: usize,
@@ -313,6 +365,18 @@ pub unsafe fn webp_decode_yuv_into(
     )
 }
 
+/// Main call
+/// 
+/// Main encoding call, after config and picture have been initialized.
+/// 'picture' must be less than 16384x16384 in dimension (cf WEBP_MAX_DIMENSION),
+/// and the 'config' object must be a valid one.
+/// Returns false in case of error, true otherwise.
+/// In case of error, picture->error_code is updated accordingly.
+/// 'picture' can hold the source samples in both YUV(A) or ARGB input, depending
+/// on the value of 'picture->use_argb'. It is highly recommended to use
+/// the former for lossy encoding, and the latter for lossless encoding
+/// (when config.lossless is true). Automatic conversion from one format to
+/// another is provided but they both incur some loss.
 pub unsafe fn webp_encode(
     config: *const WebPConfig,
     picture: *mut WebPPicture,
@@ -320,6 +384,7 @@ pub unsafe fn webp_encode(
     crate::raw::webp::WebPEncode(config, picture)
 }
 
+/// One-stop-shop call! No questions asked:
 pub unsafe fn webp_encode_bgr(
     bgr: *const u8,
     width: ::std::os::raw::c_int,
@@ -338,6 +403,7 @@ pub unsafe fn webp_encode_bgr(
     )
 }
 
+/// One-stop-shop call! No questions asked:
 pub unsafe fn webp_encode_bgra(
     bgra: *const u8,
     width: ::std::os::raw::c_int,
@@ -356,6 +422,7 @@ pub unsafe fn webp_encode_bgra(
     )
 }
 
+/// One-stop-shop call! No questions asked:
 pub unsafe fn webp_encode_lossless_bgr(
     bgr: *const u8,
     width: ::std::os::raw::c_int,
@@ -372,6 +439,7 @@ pub unsafe fn webp_encode_lossless_bgr(
     )
 }
 
+/// One-stop-shop call! No questions asked:
 pub unsafe fn webp_encode_lossless_bgra(
     rgba: *const u8,
     width: ::std::os::raw::c_int,
@@ -388,6 +456,7 @@ pub unsafe fn webp_encode_lossless_bgra(
     )
 }
 
+/// One-stop-shop call! No questions asked:
 pub unsafe fn webp_encode_lossless_rgb(
     rgb: *const u8,
     width: ::std::os::raw::c_int,
@@ -404,6 +473,7 @@ pub unsafe fn webp_encode_lossless_rgb(
     )
 }
 
+/// One-stop-shop call! No questions asked:
 pub unsafe fn webp_encode_lossless_rgba(
     rgba: *const u8,
     width: ::std::os::raw::c_int,
@@ -420,6 +490,7 @@ pub unsafe fn webp_encode_lossless_rgba(
     )
 }
 
+/// One-stop-shop call! No questions asked:
 pub unsafe fn webp_encode_rgb(
     rgb: *const u8,
     width: ::std::os::raw::c_int,
@@ -438,6 +509,7 @@ pub unsafe fn webp_encode_rgb(
     )
 }
 
+/// One-stop-shop call! No questions asked:
 pub unsafe fn webp_encode_rgba(
     rgba: *const u8,
     width: ::std::os::raw::c_int,
@@ -456,22 +528,30 @@ pub unsafe fn webp_encode_rgba(
     )
 }
 
+/// Releases memory returned by the WebPDecode*() functions (from decode.h).
 pub unsafe fn webp_free(ptr: *mut ::std::os::raw::c_void) {
     crate::raw::webp::WebPFree(ptr)
 }
 
+/// Free any memory associated with the buffer. Must always be called last.
+/// Note: doesn't free the 'buffer' structure itself.
 pub unsafe fn webp_free_dec_buffer(buffer: *mut WebPDecBuffer) {
     crate::raw::webp::WebPFreeDecBuffer(buffer)
 }
 
+/// Return the decoder's version number, packed in hexadecimal using 8bits for
+/// each of major/minor/revision. E.g: v2.5.7 is 0x020507.
 pub unsafe fn webp_get_decoder_version() -> c_int {
     crate::raw::webp::WebPGetDecoderVersion()
 }
 
+/// Return the encoder's version number, packed in hexadecimal using 8bits for
+/// each of major/minor/revision. E.g: v2.5.7 is 0x020507.
 pub unsafe fn webp_get_encoder_version() -> c_int {
     crate::raw::webp::WebPGetEncoderVersion()
 }
 
+/// Internal, version-checked, entry point.
 pub unsafe fn webp_get_features_internal(
     arg1: *const u8,
     arg2: usize,
@@ -486,6 +566,16 @@ pub unsafe fn webp_get_features_internal(
     )
 }
 
+/// Retrieve basic header information: width, height.
+/// This function will also validate the header, returning true on success,
+/// false otherwise. '*width' and '*height' are only valid on successful return.
+/// Pointers 'width' and 'height' can be passed NULL if deemed irrelevant.
+/// Note: The following chunk sequences (before the raw VP8/VP8L data) are
+/// considered valid by this function:
+/// RIFF + VP8(L)
+/// RIFF + VP8X + (optional chunks) + VP8(L)
+/// ALPH + VP8 <-- Not a valid WebP format: only allowed for internal purpose.
+/// VP8(L)     <-- Not a valid WebP format: only allowed for internal purpose.
 pub unsafe fn webp_get_info(
     data: *const u8,
     data_size: usize,
@@ -500,6 +590,9 @@ pub unsafe fn webp_get_info(
     )
 }
 
+/// Copies and decodes the next available data. Returns VP8_STATUS_OK when
+/// the image is successfully decoded. Returns VP8_STATUS_SUSPENDED when more
+/// data is expected. Returns error in other cases.
 pub unsafe fn webp_iappend(
     idec: *mut WebPIDecoder,
     data: *const u8,
@@ -512,6 +605,13 @@ pub unsafe fn webp_iappend(
     )
 }
 
+/// Returns the RGB/A image decoded so far. Returns NULL if output params
+/// are not initialized yet. The RGB/A output type corresponds to the colorspace
+/// specified during call to WebPINewDecoder() or WebPINewRGB().
+/// *last_y is the index of last decoded row in raster scan order. Some pointers
+/// (*last_y, *width etc.) can be NULL if corresponding information is not
+/// needed. The values in these pointers are only valid on successful (non-NULL)
+/// return.
 pub unsafe fn webp_idec_get_rgb(
     idec: *const WebPIDecoder,
     last_y: *mut ::std::os::raw::c_int,
@@ -528,6 +628,9 @@ pub unsafe fn webp_idec_get_rgb(
     )
 }
 
+/// Same as above function to get a YUVA image. Returns pointer to the luma
+/// plane or NULL in case of error. If there is no alpha information
+/// the alpha pointer '*a' will be returned NULL.
 pub unsafe fn webp_idec_get_yuva(
     idec: *const WebPIDecoder,
     last_y: *mut ::std::os::raw::c_int,
@@ -554,6 +657,19 @@ pub unsafe fn webp_idec_get_yuva(
     )
 }
 
+/// Instantiate a new incremental decoder object with the requested
+/// configuration.
+/// 
+/// The bitstream can be passed using 'data' and 'data_size'
+/// parameter, in which case the features will be parsed and stored into
+/// config->input. Otherwise, 'data' can be NULL and no parsing will occur.
+/// Note that 'config' can be NULL too, in which case a default configuration
+/// is used. If 'config' is not NULL, it must outlive the WebPIDecoder object
+/// as some references to its fields will be used. No internal copy of 'config'
+/// is made.
+/// The return WebPIDecoder object must always be deleted calling WebPIDelete().
+/// Returns NULL in case of error (and config->status will then reflect
+/// the error condition, if available).
 pub unsafe fn webp_idecode(
     data: *const u8,
     data_size: usize,
@@ -566,6 +682,12 @@ pub unsafe fn webp_idecode(
     )
 }
 
+/// Generic call to retrieve information about the displayable area.
+/// If non NULL, the left/right/width/height pointers are filled with the visible
+/// rectangular area so far.
+/// Returns NULL in case the incremental decoder object is in an invalid state.
+/// Otherwise returns the pointer to the internal representation. This structure
+/// is read-only, tied to WebPIDecoder's lifespan and should not be modified.
 pub unsafe fn webp_idecoded_area(
     idec: *const WebPIDecoder,
     left: *mut ::std::os::raw::c_int,
@@ -582,14 +704,38 @@ pub unsafe fn webp_idecoded_area(
     )
 }
 
+/// Deletes the WebPIDecoder object and associated memory. Must always be called
+/// if WebPINewDecoder, WebPINewRGB or WebPINewYUV succeeded.
 pub unsafe fn webp_idelete(idec: *mut WebPIDecoder) {
     crate::raw::webp::WebPIDelete(idec)
 }
 
+/// Creates a new incremental decoder with the supplied buffer parameter.
+/// This output_buffer can be passed NULL, in which case a default output buffer
+/// is used (with MODE_RGB). Otherwise, an internal reference to 'output_buffer'
+/// is kept, which means that the lifespan of 'output_buffer' must be larger than
+/// that of the returned WebPIDecoder object.
+/// The supplied 'output_buffer' content MUST NOT be changed between calls to
+/// WebPIAppend() or WebPIUpdate() unless 'output_buffer.is_external_memory' is
+/// not set to 0. In such a case, it is allowed to modify the pointers, size and
+/// stride of output_buffer.u.RGBA or output_buffer.u.YUVA, provided they remain
+/// within valid bounds.
+/// All other fields of WebPDecBuffer MUST remain constant between calls.
+/// Returns NULL if the allocation failed.
 pub unsafe fn webp_inew_decoder(output_buffer: *mut WebPDecBuffer) -> *mut WebPIDecoder {
     crate::raw::webp::WebPINewDecoder(output_buffer)
 }
 
+/// This function allocates and initializes an incremental-decoder object, which
+/// will output the RGB/A samples specified by 'csp' into a preallocated
+/// buffer 'output_buffer'. The size of this buffer is at least
+/// 'output_buffer_size' and the stride (distance in bytes between two scanlines)
+/// is specified by 'output_stride'.
+/// Additionally, output_buffer can be passed NULL in which case the output
+/// buffer will be allocated automatically when the decoding starts. The
+/// colorspace 'csp' is taken into account for allocating this buffer. All other
+/// parameters are ignored.
+/// Returns NULL if the allocation failed, or if some parameters are invalid.
 pub unsafe fn webp_inew_rgb(
     csp: WebPCSPMode,
     output_buffer: *mut u8,
@@ -604,6 +750,8 @@ pub unsafe fn webp_inew_rgb(
     )
 }
 
+/// Deprecated version of the above, without the alpha plane.
+/// Kept for backward compatibility.
 pub unsafe fn webp_inew_yuv(
     luma: *mut u8,
     luma_size: usize,
@@ -628,6 +776,17 @@ pub unsafe fn webp_inew_yuv(
     )
 }
 
+/// This function allocates and initializes an incremental-decoder object, which
+/// will output the raw luma/chroma samples into a preallocated planes if
+/// supplied. The luma plane is specified by its pointer 'luma', its size
+/// 'luma_size' and its stride 'luma_stride'. Similarly, the chroma-u plane
+/// is specified by the 'u', 'u_size' and 'u_stride' parameters, and the chroma-v
+/// plane by 'v' and 'v_size'. And same for the alpha-plane. The 'a' pointer
+/// can be pass NULL in case one is not interested in the transparency plane.
+/// Conversely, 'luma' can be passed NULL if no preallocated planes are supplied.
+/// In this case, the output buffer will be automatically allocated (using
+/// MODE_YUVA) when decoding starts. All parameters are then ignored.
+/// Returns NULL if the allocation failed or if a parameter is invalid.
 pub unsafe fn webp_inew_yuva(
     luma: *mut u8,
     luma_size: usize,
@@ -658,6 +817,11 @@ pub unsafe fn webp_inew_yuva(
     )
 }
 
+/// A variant of the above function to be used when data buffer contains
+/// partial data from the beginning. In this case data buffer is not copied
+/// to the internal memory.
+/// Note that the value of the 'data' pointer can change between calls to
+/// WebPIUpdate, for instance when the data buffer is resized to fit larger data.
 pub unsafe fn webp_iupdate(
     idec: *mut WebPIDecoder,
     data: *const u8,
@@ -666,6 +830,7 @@ pub unsafe fn webp_iupdate(
     crate::raw::webp::WebPIUpdate(idec, data, data_size)
 }
 
+/// Internal, version-checked, entry point
 pub unsafe fn webp_init_dec_buffer_internal(
     arg1: *mut WebPDecBuffer,
     arg2: ::std::os::raw::c_int,
@@ -673,6 +838,7 @@ pub unsafe fn webp_init_dec_buffer_internal(
     crate::raw::webp::WebPInitDecBufferInternal(arg1, arg2)
 }
 
+/// Internal, version-checked, entry point
 pub unsafe fn webp_init_decoder_config_internal(
     arg1: *mut WebPDecoderConfig,
     arg2: ::std::os::raw::c_int,
@@ -680,6 +846,8 @@ pub unsafe fn webp_init_decoder_config_internal(
     crate::raw::webp::WebPInitDecoderConfigInternal(arg1, arg2)
 }
 
+/// WebPMemoryWrite: a special WebPWriterFunction that writes to memory using
+/// the following WebPMemoryWriter object (to be set as a custom_ptr).
 pub unsafe fn webp_memory_write(
     data: *const u8,
     data_size: usize,
@@ -688,14 +856,23 @@ pub unsafe fn webp_memory_write(
     crate::raw::webp::WebPMemoryWrite(data, data_size, picture)
 }
 
+/// The following must be called to deallocate writer->mem memory. The 'writer'
+/// object itself is not deallocated.
 pub unsafe fn webp_memory_writer_clear(writer: *mut WebPMemoryWriter) {
     crate::raw::webp::WebPMemoryWriterClear(writer)
 }
 
+/// The following must be called first before any use.
 pub unsafe fn webp_memory_writer_init(writer: *mut WebPMemoryWriter) {
     crate::raw::webp::WebPMemoryWriterInit(writer)
 }
 
+/// Converts picture->argb data to the YUV420A format. The 'colorspace'
+/// parameter is deprecated and should be equal to WEBP_YUV420.
+/// Upon return, picture->use_argb is set to false. The presence of real
+/// non-opaque transparent values is detected, and 'colorspace' will be
+/// adjusted accordingly. Note that this method is lossy.
+/// Returns false in case of error.
 pub unsafe fn webp_picture_argb_to_yuva(
     picture: *mut WebPPicture,
     arg1: WebPEncCSP,
@@ -703,6 +880,10 @@ pub unsafe fn webp_picture_argb_to_yuva(
     crate::raw::webp::WebPPictureARGBToYUVA(picture, arg1)
 }
 
+/// Same as WebPPictureARGBToYUVA(), but the conversion is done using
+/// pseudo-random dithering with a strength 'dithering' between
+/// 0.0 (no dithering) and 1.0 (maximum dithering). This is useful
+/// for photographic picture.
 pub unsafe fn webp_picture_argb_to_yuva_dithered(
     picture: *mut WebPPicture,
     colorspace: WebPEncCSP,
@@ -715,14 +896,31 @@ pub unsafe fn webp_picture_argb_to_yuva_dithered(
     )
 }
 
+
+/// Convenience allocation / deallocation based on picture->width/height:
+/// Allocate y/u/v buffers as per colorspace/width/height specification.
+/// Note! This function will free the previous buffer if needed.
+/// Returns false in case of memory error.
 pub unsafe fn webp_picture_alloc(picture: *mut WebPPicture) -> c_int {
     crate::raw::webp::WebPPictureAlloc(picture)
 }
 
+/// Copy the pixels of *src into *dst, using WebPPictureAlloc. Upon return, *dst
+/// will fully own the copied pixels (this is not a view). The 'dst' picture need
+/// not be initialized as its content is overwritten.
+/// Returns false in case of memory allocation error.
 pub unsafe fn webp_picture_copy(src: *const WebPPicture, dst: *mut WebPPicture) -> c_int {
     crate::raw::webp::WebPPictureCopy(src, dst)
 }
 
+/// self-crops a picture to the rectangle defined by top/left/width/height.
+/// Returns false in case of memory allocation error, or if the rectangle is
+/// outside of the source picture.
+/// The rectangle for the view is defined by the top-left corner pixel
+/// coordinates (left, top) as well as its width and height. This rectangle
+/// must be fully be comprised inside the 'src' source picture. If the source
+/// picture uses the YUV420 colorspace, the top and left coordinates will be
+/// snapped to even values.
 pub unsafe fn webp_picture_crop(
     picture: *mut WebPPicture,
     left: ::std::os::raw::c_int,
@@ -739,6 +937,11 @@ pub unsafe fn webp_picture_crop(
     )
 }
 
+/// Compute PSNR, SSIM or LSIM distortion metric between two pictures. Results
+/// are in dB, stored in result[] in the B/G/R/A/All order. The distortion is
+/// always performed using ARGB samples. Hence if the input is YUV(A), the
+/// picture will be internally converted to ARGB (just for the measurement).
+/// Warning: this function is rather CPU-intensive.
 pub unsafe fn webp_picture_distortion(
     src: *const WebPPicture,
     ref_: *const WebPPicture,
@@ -753,10 +956,18 @@ pub unsafe fn webp_picture_distortion(
     )
 }
 
+/// Release the memory allocated by WebPPictureAlloc() or WebPPictureImport*().
+/// Note that this function does _not_ free the memory used by the 'picture'
+/// object itself.
+/// Besides memory (which is reclaimed) all other fields of 'picture' are
+/// preserved.
 pub unsafe fn webp_picture_free(picture: *mut WebPPicture) {
     crate::raw::webp::WebPPictureFree(picture)
 }
 
+/// Scan the picture 'picture' for the presence of non fully opaque alpha values.
+/// Returns true in such case. Otherwise returns false (indicating that the
+/// alpha plane can be ignored altogether e.g.).
 pub unsafe fn webp_picture_has_transparency(picture: *const WebPPicture) -> c_int {
     crate::raw::webp::WebPPictureHasTransparency(picture)
 }
@@ -797,6 +1008,10 @@ pub unsafe fn webp_picture_import_bgrx(
     )
 }
 
+/// Colorspace conversion function to import RGB samples.
+/// Previous buffer will be free'd, if any.
+/// *rgb buffer should have a size of at least height * rgb_stride.
+/// Returns false in case of memory error.
 pub unsafe fn webp_picture_import_rgb(
     picture: *mut WebPPicture,
     rgb: *const u8,
@@ -809,6 +1024,7 @@ pub unsafe fn webp_picture_import_rgb(
     )
 }
 
+/// Same as `webp_picture_import_rgb`, but for RGBA buffer.
 pub unsafe fn webp_picture_import_rgba(
     picture: *mut WebPPicture,
     rgba: *const u8,
@@ -821,6 +1037,9 @@ pub unsafe fn webp_picture_import_rgba(
     )
 }
 
+/// Same, but for RGBA buffer. Imports the RGB direct from the 32-bit format
+/// input buffer ignoring the alpha channel. Avoids needing to copy the data
+/// to a temporary 24-bit RGB buffer to import the RGB only.
 pub unsafe fn webp_picture_import_rgbx(
     picture: *mut WebPPicture,
     rgbx: *const u8,
@@ -833,6 +1052,7 @@ pub unsafe fn webp_picture_import_rgbx(
     )
 }
 
+/// Internal, version-checked, entry point
 pub unsafe fn webp_picture_init_internal(
     arg1: *mut WebPPicture,
     arg2: ::std::os::raw::c_int,
@@ -840,10 +1060,17 @@ pub unsafe fn webp_picture_init_internal(
     crate::raw::webp::WebPPictureInitInternal(arg1, arg2)
 }
 
+/// Returns true if the 'picture' is actually a view and therefore does
+/// not own the memory for pixels.
 pub unsafe fn webp_picture_is_view(picture: *const WebPPicture) -> c_int {
     crate::raw::webp::WebPPictureIsView(picture)
 }
 
+/// Rescale a picture to new dimension width x height.
+/// If either 'width' or 'height' (but not both) is 0 the corresponding
+/// dimension will be calculated preserving the aspect ratio.
+/// No gamma correction is applied.
+/// Returns false in case of error (invalid parameter or insufficient memory).
 pub unsafe fn webp_picture_rescale(
     pic: *mut WebPPicture,
     width: ::std::os::raw::c_int,
@@ -852,14 +1079,31 @@ pub unsafe fn webp_picture_rescale(
     crate::raw::webp::WebPPictureRescale(pic, width, height)
 }
 
+/// Performs 'sharp' RGBA->YUVA420 downsampling and colorspace conversion.
+/// Downsampling is handled with extra care in case of color clipping. This
+/// method is roughly 2x slower than WebPPictureARGBToYUVA() but produces better
+/// and sharper YUV representation.
+/// Returns false in case of error.
 pub unsafe fn webp_picture_sharp_argb_to_yuva(picture: *mut WebPPicture) -> c_int {
     crate::raw::webp::WebPPictureSharpARGBToYUVA(picture)
 }
 
+/// kept for backward compatibility
 pub unsafe fn webp_picture_smart_argb_to_yuva(picture: *mut WebPPicture) -> c_int {
     crate::raw::webp::WebPPictureSmartARGBToYUVA(picture)
 }
 
+/// Extracts a view from 'src' picture into 'dst'. The rectangle for the view
+/// is defined by the top-left corner pixel coordinates (left, top) as well
+/// as its width and height. This rectangle must be fully be comprised inside
+/// the 'src' source picture. If the source picture uses the YUV420 colorspace,
+/// the top and left coordinates will be snapped to even values.
+/// Picture 'src' must out-live 'dst' picture. Self-extraction of view is allowed
+/// ('src' equal to 'dst') as a mean of fast-cropping (but note that doing so,
+/// the original dimension will be lost). Picture 'dst' need not be initialized
+/// with WebPPictureInit() if it is different from 'src', since its content will
+/// be overwritten.
+/// Returns false in case of memory allocation error or invalid parameters.
 pub unsafe fn webp_picture_view(
     src: *const WebPPicture,
     left: ::std::os::raw::c_int,
@@ -878,10 +1122,23 @@ pub unsafe fn webp_picture_view(
     )
 }
 
+/// Converts picture->yuv to picture->argb and sets picture->use_argb to true.
+/// The input format must be YUV_420 or YUV_420A. The conversion from YUV420 to
+/// ARGB incurs a small loss too.
+/// Note that the use of this colorspace is discouraged if one has access to the
+/// raw ARGB samples, since using YUV420 is comparatively lossy.
+/// Returns false in case of error.
 pub unsafe fn webp_picture_yuva_to_argb(picture: *mut WebPPicture) -> c_int {
     crate::raw::webp::WebPPictureYUVAToARGB(picture)
 }
 
+/// Compute the single distortion for packed planes of samples.
+/// 'src' will be compared to 'ref', and the raw distortion stored into
+/// '*distortion'. The refined metric (log(MSE), log(1 - ssim),...' will be
+/// stored in '*result'.
+/// 'x_step' is the horizontal stride (in bytes) between samples.
+/// 'src/ref_stride' is the byte distance between rows.
+/// Returns false in case of error (bad parameter, memory allocation error, ...).
 pub unsafe fn webp_plane_distortion(
     src: *const u8,
     src_stride: usize,
@@ -908,18 +1165,34 @@ pub unsafe fn webp_plane_distortion(
     )
 }
 
+/// Returns true if 'config' is non-NULL and all configuration parameters are
+/// within their valid ranges.
 pub unsafe fn webp_validate_config(config: *const WebPConfig) -> c_int {
     crate::raw::webp::WebPValidateConfig(config)
 }
 
 #[link(name = "cbits")]
 extern "C" {
+    /// Should always be called, to initialize a fresh WebPConfig structure before
+    /// modification. Returns false in case of version mismatch. WebPConfigInit()
+    /// must have succeeded before using the 'config' object.
+    /// Note that the default values are lossless=0 and quality=75.
     pub fn webp_config_init(config: *mut WebPConfig) -> c_int;
+
+    /// This function will initialize the configuration according to a predefined
+    /// set of parameters (referred to by 'preset') and a given quality factor.
+    /// This function can be called as a replacement to WebPConfigInit(). Will
+    /// return false in case of error.
     pub fn webp_config_preset(
         config: *mut WebPConfig,
         preset: WebPPreset,
         quality: c_float,
     ) -> c_int;
+
+    /// Should always be called, to initialize the structure. Returns false in case
+    /// of version mismatch. WebPPictureInit() must have succeeded before using the
+    /// 'picture' object.
+    /// Note that, by default, use_argb is false and colorspace is WEBP_YUV420.
     pub fn webp_picture_init(picture: *mut WebPPicture) -> c_int;
 }
 
