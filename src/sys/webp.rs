@@ -3,7 +3,9 @@ use std::ffi::{CString, c_void};
 use std::os::raw::{c_char, c_int};
 use libc::{size_t, c_float};
 
+///////////////////////////////////////////////////////////////////////////////
 // WEBP STRUCTS
+///////////////////////////////////////////////////////////////////////////////
 pub type WebPAuxStats = crate::raw::webp::WebPAuxStats;
 pub type WebPBitstreamFeatures = crate::raw::webp::WebPBitstreamFeatures;
 pub type WebPConfig = crate::raw::webp::WebPConfig;
@@ -16,7 +18,9 @@ pub type WebPPicture = crate::raw::webp::WebPPicture;
 pub type WebPRGBABuffer = crate::raw::webp::WebPRGBABuffer;
 pub type WebPYUVABuffer = crate::raw::webp::WebPYUVABuffer;
 
+///////////////////////////////////////////////////////////////////////////////
 // TYPE-DEFS
+///////////////////////////////////////////////////////////////////////////////
 pub type VP8StatusCode = crate::raw::webp::VP8StatusCode;
 pub type WebPCSPMode = crate::raw::webp::WEBP_CSP_MODE;
 pub type WebPEncCSP = crate::raw::webp::WebPEncCSP;
@@ -26,7 +30,9 @@ pub type WebPPreset = crate::raw::webp::WebPPreset;
 pub type WebPProgressHook = crate::raw::webp::WebPProgressHook;
 pub type WebPWriterFunction = crate::raw::webp::WebPWriterFunction;
 
+///////////////////////////////////////////////////////////////////////////////
 // WEBP CONSTANTS
+///////////////////////////////////////////////////////////////////////////////
 pub const WEBP_CSP_MODE_MODE_ARGB: WebPCSPMode = crate::raw::webp::WEBP_CSP_MODE_MODE_ARGB;
 #[allow(non_upper_case_globals)]
 pub const WEBP_CSP_MODE_MODE_Argb: WebPCSPMode = crate::raw::webp::WEBP_CSP_MODE_MODE_Argb;
@@ -42,7 +48,6 @@ pub const WEBP_CSP_MODE_MODE_YUVA: WebPCSPMode = crate::raw::webp::WEBP_CSP_MODE
 pub const WEBP_CSP_MODE_MODE_bgrA: WebPCSPMode = crate::raw::webp::WEBP_CSP_MODE_MODE_bgrA;
 pub const WEBP_CSP_MODE_MODE_rgbA: WebPCSPMode = crate::raw::webp::WEBP_CSP_MODE_MODE_rgbA;
 pub const WEBP_CSP_MODE_MODE_rgbA_4444: WebPCSPMode = crate::raw::webp::WEBP_CSP_MODE_MODE_rgbA_4444;
-
 pub const WEBP_DECODER_ABI_VERSION: u32 = crate::raw::webp::WEBP_DECODER_ABI_VERSION;
 pub const WEBP_ENCODER_ABI_VERSION: u32 = crate::raw::webp::WEBP_ENCODER_ABI_VERSION;
 pub const WEBP_MAX_DIMENSION: u32 = crate::raw::webp::WEBP_MAX_DIMENSION;
@@ -76,8 +81,9 @@ pub const WebPPreset_WEBP_PRESET_PHOTO: u32 = crate::raw::webp::WebPPreset_WEBP_
 pub const WebPPreset_WEBP_PRESET_PICTURE: u32 = crate::raw::webp::WebPPreset_WEBP_PRESET_PICTURE;
 pub const WebPPreset_WEBP_PRESET_TEXT: u32 = crate::raw::webp::WebPPreset_WEBP_PRESET_TEXT;
 
+///////////////////////////////////////////////////////////////////////////////
 // WEBP FUNCTIONS
-
+///////////////////////////////////////////////////////////////////////////////
 pub unsafe fn webp_blend_alpha(pic: *mut WebPPicture, background_rgb: u32) {
     crate::raw::webp::WebPBlendAlpha(pic, background_rgb)
 }
