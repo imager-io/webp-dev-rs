@@ -26,12 +26,12 @@ pub fn empty_lossless_webp_picture() -> WebPPicture {
         pad1: [0, 0],
         
         // ARGB input
-        argb: unimplemented!(),
-        argb_stride: unimplemented!(),
+        argb: std::ptr::null_mut(),
+        argb_stride: 0,
         pad2: [
-            unimplemented!(),
-            unimplemented!(),
-            unimplemented!(),
+            0,
+            0,
+            0,
         ],
 
         // OUTPUT
