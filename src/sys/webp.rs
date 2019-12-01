@@ -84,12 +84,16 @@ pub const WebPPreset_WEBP_PRESET_TEXT: u32 = crate::raw::webp::WebPPreset_WEBP_P
 ///////////////////////////////////////////////////////////////////////////////
 // WEBP FUNCTIONS
 ///////////////////////////////////////////////////////////////////////////////
+
+
 pub unsafe fn webp_blend_alpha(pic: *mut WebPPicture, background_rgb: u32) {
     crate::raw::webp::WebPBlendAlpha(pic, background_rgb)
 }
+
 pub unsafe fn webp_cleanup_transparent_area(picture: *mut WebPPicture) {
     crate::raw::webp::WebPCleanupTransparentArea(picture)
 }
+
 pub unsafe fn webp_config_init_internal(
     arg1: *mut WebPConfig,
     arg2: WebPPreset,
@@ -98,12 +102,14 @@ pub unsafe fn webp_config_init_internal(
 ) -> c_int {
     crate::raw::webp::WebPConfigInitInternal(arg1, arg2, arg3, arg4)
 }
+
 pub unsafe fn webp_config_lossless_preset(
     config: *mut WebPConfig,
     level: ::std::os::raw::c_int,
 ) -> c_int {
     crate::raw::webp::WebPConfigLosslessPreset(config, level)
 }
+
 pub unsafe fn webp_decode(
     data: *const u8,
     data_size: usize,
@@ -111,6 +117,7 @@ pub unsafe fn webp_decode(
 ) -> VP8StatusCode {
     crate::raw::webp::WebPDecode(data, data_size, config)
 }
+
 pub unsafe fn webp_decode_argb(
     data: *const u8,
     data_size: usize,
@@ -119,6 +126,7 @@ pub unsafe fn webp_decode_argb(
 ) -> *mut u8 {
     crate::raw::webp::WebPDecodeARGB(data, data_size, width, height)
 }
+
 pub unsafe fn webp_decode_argb_into(
     data: *const u8,
     data_size: usize,
@@ -134,6 +142,7 @@ pub unsafe fn webp_decode_argb_into(
         output_stride,
     )
 }
+
 pub unsafe fn webp_decode_bgr(
     data: *const u8,
     data_size: usize,
@@ -147,6 +156,7 @@ pub unsafe fn webp_decode_bgr(
         height,
     )
 }
+
 pub unsafe fn webp_decode_bgra(
     data: *const u8,
     data_size: usize,
@@ -160,6 +170,7 @@ pub unsafe fn webp_decode_bgra(
         height,
     )
 }
+
 pub unsafe fn webp_decodebgra_into(
     data: *const u8,
     data_size: usize,
@@ -175,6 +186,7 @@ pub unsafe fn webp_decodebgra_into(
         output_stride,
     )
 }
+
 pub unsafe fn webp_decode_bgr_into(
     data: *const u8,
     data_size: usize,
@@ -190,6 +202,7 @@ pub unsafe fn webp_decode_bgr_into(
         output_stride,
     )
 }
+
 pub unsafe fn webp_decode_rgb(
     data: *const u8,
     data_size: usize,
@@ -203,6 +216,7 @@ pub unsafe fn webp_decode_rgb(
         height,
     )
 }
+
 pub unsafe fn webp_decode_rgba(
     data: *const u8,
     data_size: usize,
@@ -216,6 +230,7 @@ pub unsafe fn webp_decode_rgba(
         height,
     )
 }
+
 pub unsafe fn webp_decode_rgba_into(
     data: *const u8,
     data_size: usize,
@@ -231,6 +246,7 @@ pub unsafe fn webp_decode_rgba_into(
         output_stride,
     )
 }
+
 pub unsafe fn webp_decode_rgb_into(
     data: *const u8,
     data_size: usize,
@@ -246,6 +262,7 @@ pub unsafe fn webp_decode_rgb_into(
         output_stride,
     )
 }
+
 pub unsafe fn webp_decode_yuv(
     data: *const u8,
     data_size: usize,
@@ -267,6 +284,7 @@ pub unsafe fn webp_decode_yuv(
         uv_stride,
     )
 }
+
 pub unsafe fn webp_decode_yuv_into(
     data: *const u8,
     data_size: usize,
@@ -294,12 +312,14 @@ pub unsafe fn webp_decode_yuv_into(
         v_stride,
     )
 }
+
 pub unsafe fn webp_encode(
     config: *const WebPConfig,
     picture: *mut WebPPicture,
 ) -> c_int {
     crate::raw::webp::WebPEncode(config, picture)
 }
+
 pub unsafe fn webp_encode_bgr(
     bgr: *const u8,
     width: ::std::os::raw::c_int,
@@ -317,6 +337,7 @@ pub unsafe fn webp_encode_bgr(
         output,
     )
 }
+
 pub unsafe fn webp_encode_bgra(
     bgra: *const u8,
     width: ::std::os::raw::c_int,
@@ -334,6 +355,7 @@ pub unsafe fn webp_encode_bgra(
         output,
     )
 }
+
 pub unsafe fn webp_encode_lossless_bgr(
     bgr: *const u8,
     width: ::std::os::raw::c_int,
@@ -349,6 +371,7 @@ pub unsafe fn webp_encode_lossless_bgr(
         output,
     )
 }
+
 pub unsafe fn webp_encode_lossless_bgra(
     rgba: *const u8,
     width: ::std::os::raw::c_int,
@@ -364,6 +387,7 @@ pub unsafe fn webp_encode_lossless_bgra(
         output,
     )
 }
+
 pub unsafe fn webp_encode_lossless_rgb(
     rgb: *const u8,
     width: ::std::os::raw::c_int,
@@ -379,6 +403,7 @@ pub unsafe fn webp_encode_lossless_rgb(
         output,
     )
 }
+
 pub unsafe fn webp_encode_lossless_rgba(
     rgba: *const u8,
     width: ::std::os::raw::c_int,
@@ -394,6 +419,7 @@ pub unsafe fn webp_encode_lossless_rgba(
         output,
     )
 }
+
 pub unsafe fn webp_encode_rgb(
     rgb: *const u8,
     width: ::std::os::raw::c_int,
@@ -411,6 +437,7 @@ pub unsafe fn webp_encode_rgb(
         output,
     )
 }
+
 pub unsafe fn webp_encode_rgba(
     rgba: *const u8,
     width: ::std::os::raw::c_int,
@@ -428,18 +455,23 @@ pub unsafe fn webp_encode_rgba(
         output,
     )
 }
+
 pub unsafe fn webp_free(ptr: *mut ::std::os::raw::c_void) {
     crate::raw::webp::WebPFree(ptr)
 }
+
 pub unsafe fn webp_free_dec_buffer(buffer: *mut WebPDecBuffer) {
     crate::raw::webp::WebPFreeDecBuffer(buffer)
 }
+
 pub unsafe fn webp_get_decoder_version() -> c_int {
     crate::raw::webp::WebPGetDecoderVersion()
 }
+
 pub unsafe fn webp_get_encoder_version() -> c_int {
     crate::raw::webp::WebPGetEncoderVersion()
 }
+
 pub unsafe fn webp_get_features_internal(
     arg1: *const u8,
     arg2: usize,
@@ -453,6 +485,7 @@ pub unsafe fn webp_get_features_internal(
         arg4,
     )
 }
+
 pub unsafe fn webp_get_info(
     data: *const u8,
     data_size: usize,
@@ -466,6 +499,7 @@ pub unsafe fn webp_get_info(
         height,
     )
 }
+
 pub unsafe fn webp_iappend(
     idec: *mut WebPIDecoder,
     data: *const u8,
@@ -477,6 +511,7 @@ pub unsafe fn webp_iappend(
         data_size,
     )
 }
+
 pub unsafe fn webp_idec_get_rgb(
     idec: *const WebPIDecoder,
     last_y: *mut ::std::os::raw::c_int,
@@ -492,6 +527,7 @@ pub unsafe fn webp_idec_get_rgb(
         stride,
     )
 }
+
 pub unsafe fn webp_idec_get_yuva(
     idec: *const WebPIDecoder,
     last_y: *mut ::std::os::raw::c_int,
@@ -517,6 +553,7 @@ pub unsafe fn webp_idec_get_yuva(
         a_stride,
     )
 }
+
 pub unsafe fn webp_idecode(
     data: *const u8,
     data_size: usize,
@@ -528,6 +565,7 @@ pub unsafe fn webp_idecode(
         config,
     )
 }
+
 pub unsafe fn webp_idecoded_area(
     idec: *const WebPIDecoder,
     left: *mut ::std::os::raw::c_int,
@@ -543,12 +581,15 @@ pub unsafe fn webp_idecoded_area(
         height,
     )
 }
+
 pub unsafe fn webp_idelete(idec: *mut WebPIDecoder) {
     crate::raw::webp::WebPIDelete(idec)
 }
+
 pub unsafe fn webp_inew_decoder(output_buffer: *mut WebPDecBuffer) -> *mut WebPIDecoder {
     crate::raw::webp::WebPINewDecoder(output_buffer)
 }
+
 pub unsafe fn webp_inew_rgb(
     csp: WebPCSPMode,
     output_buffer: *mut u8,
@@ -562,6 +603,7 @@ pub unsafe fn webp_inew_rgb(
         output_stride,
     )
 }
+
 pub unsafe fn webp_inew_yuv(
     luma: *mut u8,
     luma_size: usize,
@@ -585,6 +627,7 @@ pub unsafe fn webp_inew_yuv(
         v_stride,
     )
 }
+
 pub unsafe fn webp_inew_yuva(
     luma: *mut u8,
     luma_size: usize,
@@ -614,6 +657,7 @@ pub unsafe fn webp_inew_yuva(
         a_stride,
     )
 }
+
 pub unsafe fn webp_iupdate(
     idec: *mut WebPIDecoder,
     data: *const u8,
@@ -621,18 +665,21 @@ pub unsafe fn webp_iupdate(
 ) -> VP8StatusCode {
     crate::raw::webp::WebPIUpdate(idec, data, data_size)
 }
+
 pub unsafe fn webp_init_dec_buffer_internal(
     arg1: *mut WebPDecBuffer,
     arg2: ::std::os::raw::c_int,
 ) -> c_int {
     crate::raw::webp::WebPInitDecBufferInternal(arg1, arg2)
 }
+
 pub unsafe fn webp_init_decoder_config_internal(
     arg1: *mut WebPDecoderConfig,
     arg2: ::std::os::raw::c_int,
 ) -> c_int {
     crate::raw::webp::WebPInitDecoderConfigInternal(arg1, arg2)
 }
+
 pub unsafe fn webp_memory_write(
     data: *const u8,
     data_size: usize,
@@ -640,18 +687,22 @@ pub unsafe fn webp_memory_write(
 ) -> c_int {
     crate::raw::webp::WebPMemoryWrite(data, data_size, picture)
 }
+
 pub unsafe fn webp_memory_writer_clear(writer: *mut WebPMemoryWriter) {
     crate::raw::webp::WebPMemoryWriterClear(writer)
 }
+
 pub unsafe fn webp_memory_writer_init(writer: *mut WebPMemoryWriter) {
     crate::raw::webp::WebPMemoryWriterInit(writer)
 }
+
 pub unsafe fn webp_picture_argb_to_yuva(
     picture: *mut WebPPicture,
     arg1: WebPEncCSP,
 ) -> c_int {
     crate::raw::webp::WebPPictureARGBToYUVA(picture, arg1)
 }
+
 pub unsafe fn webp_picture_argb_to_yuva_dithered(
     picture: *mut WebPPicture,
     colorspace: WebPEncCSP,
@@ -663,12 +714,15 @@ pub unsafe fn webp_picture_argb_to_yuva_dithered(
         dithering,
     )
 }
+
 pub unsafe fn webp_picture_alloc(picture: *mut WebPPicture) -> c_int {
     crate::raw::webp::WebPPictureAlloc(picture)
 }
+
 pub unsafe fn webp_picture_copy(src: *const WebPPicture, dst: *mut WebPPicture) -> c_int {
     crate::raw::webp::WebPPictureCopy(src, dst)
 }
+
 pub unsafe fn webp_picture_crop(
     picture: *mut WebPPicture,
     left: ::std::os::raw::c_int,
@@ -684,6 +738,7 @@ pub unsafe fn webp_picture_crop(
         height,
     )
 }
+
 pub unsafe fn webp_picture_distortion(
     src: *const WebPPicture,
     ref_: *const WebPPicture,
@@ -697,12 +752,15 @@ pub unsafe fn webp_picture_distortion(
         result,
     )
 }
+
 pub unsafe fn webp_picture_free(picture: *mut WebPPicture) {
     crate::raw::webp::WebPPictureFree(picture)
 }
+
 pub unsafe fn webp_picture_has_transparency(picture: *const WebPPicture) -> c_int {
     crate::raw::webp::WebPPictureHasTransparency(picture)
 }
+
 pub unsafe fn webp_picture_import_bgr(
     picture: *mut WebPPicture,
     bgr: *const u8,
@@ -714,6 +772,7 @@ pub unsafe fn webp_picture_import_bgr(
         bgr_stride,
     )
 }
+
 pub unsafe fn webp_picture_import_bgra(
     picture: *mut WebPPicture,
     bgra: *const u8,
@@ -725,6 +784,7 @@ pub unsafe fn webp_picture_import_bgra(
         bgra_stride,
     )
 }
+
 pub unsafe fn webp_picture_import_bgrx(
     picture: *mut WebPPicture,
     bgrx: *const u8,
@@ -736,6 +796,7 @@ pub unsafe fn webp_picture_import_bgrx(
         bgrx_stride,
     )
 }
+
 pub unsafe fn webp_picture_import_rgb(
     picture: *mut WebPPicture,
     rgb: *const u8,
@@ -747,6 +808,7 @@ pub unsafe fn webp_picture_import_rgb(
         rgb_stride,
     )
 }
+
 pub unsafe fn webp_picture_import_rgba(
     picture: *mut WebPPicture,
     rgba: *const u8,
@@ -758,6 +820,7 @@ pub unsafe fn webp_picture_import_rgba(
         rgba_stride,
     )
 }
+
 pub unsafe fn webp_picture_import_rgbx(
     picture: *mut WebPPicture,
     rgbx: *const u8,
@@ -769,15 +832,18 @@ pub unsafe fn webp_picture_import_rgbx(
         rgbx_stride,
     )
 }
+
 pub unsafe fn webp_picture_init_internal(
     arg1: *mut WebPPicture,
     arg2: ::std::os::raw::c_int,
 ) -> c_int {
     crate::raw::webp::WebPPictureInitInternal(arg1, arg2)
 }
+
 pub unsafe fn webp_picture_is_view(picture: *const WebPPicture) -> c_int {
     crate::raw::webp::WebPPictureIsView(picture)
 }
+
 pub unsafe fn webp_picture_rescale(
     pic: *mut WebPPicture,
     width: ::std::os::raw::c_int,
@@ -785,12 +851,15 @@ pub unsafe fn webp_picture_rescale(
 ) -> c_int {
     crate::raw::webp::WebPPictureRescale(pic, width, height)
 }
+
 pub unsafe fn webp_picture_sharp_argb_to_yuva(picture: *mut WebPPicture) -> c_int {
     crate::raw::webp::WebPPictureSharpARGBToYUVA(picture)
 }
+
 pub unsafe fn webp_picture_smart_argb_to_yuva(picture: *mut WebPPicture) -> c_int {
     crate::raw::webp::WebPPictureSmartARGBToYUVA(picture)
 }
+
 pub unsafe fn webp_picture_view(
     src: *const WebPPicture,
     left: ::std::os::raw::c_int,
@@ -808,9 +877,11 @@ pub unsafe fn webp_picture_view(
         dst,
     )
 }
+
 pub unsafe fn webp_picture_yuva_to_argb(picture: *mut WebPPicture) -> c_int {
     crate::raw::webp::WebPPictureYUVAToARGB(picture)
 }
+
 pub unsafe fn webp_plane_distortion(
     src: *const u8,
     src_stride: usize,
@@ -836,6 +907,7 @@ pub unsafe fn webp_plane_distortion(
         result,
     )
 }
+
 pub unsafe fn webp_validate_config(config: *const WebPConfig) -> c_int {
     crate::raw::webp::WebPValidateConfig(config)
 }
