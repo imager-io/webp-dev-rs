@@ -138,31 +138,6 @@ pub const WEBP_HEADERS: &[&str] = &[
     "src/webp/types.h",
 ];
 
-
-///////////////////////////////////////////////////////////////////////////////
-// IMAGEIO PATHS
-///////////////////////////////////////////////////////////////////////////////
-
-// pub const IMAGEIO_STATIC_LIBS: &[(&str, &str)] = &[
-//     ("imagedec", "./imageio/libimagedec.a"),
-//     ("imageenc", "./imageio/libimageenc.a"),
-//     ("imageio_util", "./imageio/libimageio_util.a"),
-// ];
-
-// pub const IMAGEIO_HEADERS: &[&str] = &[
-//     "imageio/image_dec.h",
-//     "imageio/image_enc.h",
-//     "imageio/imageio_util.h",
-//     "imageio/jpegdec.h",
-//     "imageio/metadata.h",
-//     "imageio/pngdec.h",
-//     "imageio/pnmdec.h",
-//     "imageio/tiffdec.h",
-//     "imageio/webpdec.h",
-//     "imageio/wicdec.h",
-// ];
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // BUILD PIPELINE
 ///////////////////////////////////////////////////////////////////////////////
@@ -170,11 +145,8 @@ pub const WEBP_HEADERS: &[&str] = &[
 fn build() {
     let out_path = out_dir();
     // SETUP
-    extract_tar_file("archive/libwebp@v1.0.3.tar", &out_path);
-    let source_path = {
-        let xs = files_with_prefix(&out_path, "webmproject-libwebp-");
-        lookup_newest(xs).expect("extracted webp source files from tar archive")
-    };
+    extract_tar_file("archive/webmproject-libwebp-8bac456.v1.0.3.tar.gz", &out_path);
+    let source_path = out_path.join("webmproject-libwebp-8bac456");
     // BUILD
     run_make(&source_path, "makefile.unix");
     // LINK
@@ -190,21 +162,9 @@ fn build() {
             .to_str()
             .expect("PathBuf as str")
     });
-    // println!("cargo:rustc-link-search=native={}", {
-    //     source_path
-    //         .join("imageio")
-    //         .to_str()
-    //         .expect("PathBuf as str")
-    // });
     for (name, _) in WEBP_STATIC_LIBS {
         println!("cargo:rustc-link-lib=static={}", name);
     }
-    // for (name, _) in IMAGEIO_STATIC_LIBS {
-    //     println!("cargo:rustc-link-lib=static={}", name);
-    // }
-    // // * DYNAMIC LIBRARY DEPENDENCIES - TODO: PHASE OUT
-    // println!("cargo:rustc-link-lib=jpeg");
-    // println!("cargo:rustc-link-lib=png");
     // CODEGEN
     let codegen = |file_name: &str, headers: &[&str]| {
         let codegen = bindgen::Builder::default();
@@ -218,13 +178,15 @@ fn build() {
             });
         codegen
             .generate_comments(true)
+            .layout_tests(false)
+            .rustfmt_bindings(true)
+            .detect_include_paths(true)
             .generate()
             .expect("Unable to generate bindings")
             .write_to_file(out_path.join(file_name))
             .expect("Couldn't write bindings!");    
     };
     codegen("bindings_webp.rs", WEBP_HEADERS);
-    // codegen("bindings_imageio.rs", IMAGEIO_HEADERS);
     // COMPILE CBITS
     cc::Build::new()
         .include({
